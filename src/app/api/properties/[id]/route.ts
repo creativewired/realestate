@@ -1,43 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readFileSync, writeFileSync } from "fs";
-import { join } from "path";
+import { getAllProperties } from "@/lib/data";
+import { writeFileToGitHub } from "@/lib/github";
 
-const FILE = join(process.cwd(), "public", "data", "properties.json");
+type Params = { params: Promise<{ id: string }> };
 
-function read(): Record<string, unknown>[] {
+export async function PUT(req: NextRequest, { params }: Params) {
   try {
-    const raw = JSON.parse(readFileSync(FILE, "utf-8"));
-    return Array.isArray(raw) ? raw : [];
-  } catch {
-    return [];
+    const { id } = await params;
+    const body = await req.json();
+    const properties = getAllProperties();
+    const idx = properties.findIndex((p) => p.id === id);
+    if (idx === -1) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    properties[idx] = { ...properties[idx], ...body };
+    await writeFileToGitHub(
+      "public/data/properties.json",
+      JSON.stringify(properties, null, 2),
+      `Update property: ${properties[idx].title}`
+    );
+    return NextResponse.json(properties[idx]);
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: "Failed to save" }, { status: 500 });
   }
 }
 
-function write(data: unknown) {
-  writeFileSync(FILE, JSON.stringify(data, null, 2));
-}
-
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const { id } = await params;
-  const body = await req.json();
-  const properties = read();
-  const idx = properties.findIndex((p) => p.id === id);
-  if (idx === -1) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  properties[idx] = { ...properties[idx], ...body };
-  write(properties);
-  return NextResponse.json(properties[idx]);
-}
-
-export async function DELETE(
-  _: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const { id } = await params;
-  const properties = read();
-  const filtered = properties.filter((p) => p.id !== id);
-  write(filtered);
-  return NextResponse.json({ ok: true });
+export async function DELETE(_: NextRequest, { params }: Params) {
+  try {
+    const { id } = await params;
+    const properties = getAllProperties();
+    const filtered = properties.filter((p) => p.id !== id);
+    await writeFileToGitHub(
+      "public/data/properties.json",
+      JSON.stringify(filtered, null, 2),
+      `Delete property: ${id}`
+    );
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: "Failed to delete" }, { status: 500 });
+  }
 }

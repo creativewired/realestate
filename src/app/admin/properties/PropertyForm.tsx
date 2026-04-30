@@ -26,6 +26,9 @@ type FormData = {
   mainImage: string; gallery: string; featured: boolean;
 };
 
+// Pending file + its local preview URL
+type PendingFile = { file: File; preview: string };
+
 export default function PropertyForm({
   mode,
   property,
@@ -34,114 +37,159 @@ export default function PropertyForm({
   property?: Property;
 }) {
   const router = useRouter();
-  const [saving, setSaving]   = useState(false);
-  const [error, setError]     = useState("");
-  const [uploading, setUploading] = useState<"main" | "gallery" | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [error,  setError]  = useState("");
+
+  // Pending uploads — held in memory, NOT uploaded yet
+  const [pendingMain,    setPendingMain]    = useState<PendingFile | null>(null);
+  const [pendingGallery, setPendingGallery] = useState<PendingFile[]>([]);
 
   const [form, setForm] = useState<FormData>({
-    title:            property?.title            ?? "",
-    price:            property?.price?.toString() ?? "",
-    currency:         property?.currency         ?? "AED",
-    location:         property?.location         ?? "",
-    type:             property?.type             ?? "Apartment",
+    title:            property?.title               ?? "",
+    price:            property?.price?.toString()   ?? "",
+    currency:         property?.currency            ?? "AED",
+    location:         property?.location            ?? "",
+    type:             property?.type                ?? "Apartment",
     bedrooms:         property?.bedrooms?.toString() ?? "0",
     bathrooms:        property?.bathrooms?.toString() ?? "1",
-    area:             property?.area?.toString()  ?? "",
-    areaUnit:         property?.areaUnit         ?? "sqft",
-    status:           property?.status           ?? "available",
-    shortDescription: property?.shortDescription ?? "",
-    fullDescription:  property?.fullDescription  ?? "",
-    mainImage:        property?.mainImage        ?? "",
+    area:             property?.area?.toString()    ?? "",
+    areaUnit:         property?.areaUnit            ?? "sqft",
+    status:           property?.status              ?? "available",
+    shortDescription: property?.shortDescription    ?? "",
+    fullDescription:  property?.fullDescription     ?? "",
+    mainImage:        property?.mainImage           ?? "",
     gallery:          property?.gallery?.join("\n") ?? "",
-    featured:         property?.featured         ?? false,
+    featured:         property?.featured            ?? false,
   });
 
   function set(key: keyof FormData, value: string | boolean) {
     setForm((f) => ({ ...f, [key]: value }));
   }
 
-  async function uploadImage(file: File, key: "main" | "gallery") {
-    setUploading(key);
+  // ── Select main image — preview only, no upload ──
+  function handleMainImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const preview = URL.createObjectURL(file);
+    setPendingMain({ file, preview });
+    // Clear any manual URL so preview takes over
+    set("mainImage", "");
+    // Reset input so same file can be re-selected
+    e.target.value = "";
+  }
+
+  // ── Select gallery images — preview only, no upload ──
+  function handleGallerySelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    if (!files.length) return;
+    const newPending = files.map((file) => ({
+      file,
+      preview: URL.createObjectURL(file),
+    }));
+    setPendingGallery((prev) => [...prev, ...newPending]);
+    e.target.value = "";
+  }
+
+  // ── Upload a single file to GitHub via API ──
+  async function uploadFile(file: File): Promise<string> {
     const fd = new FormData();
     fd.append("file", file);
     const res = await fetch("/api/upload", { method: "POST", body: fd });
+    if (!res.ok) throw new Error("Upload failed");
     const { url } = await res.json();
-    setUploading(null);
     return url as string;
   }
 
-  async function handleMainImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const url = await uploadImage(file, "main");
-    set("mainImage", url);
-  }
-
-  async function handleGalleryUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(e.target.files ?? []);
-    if (!files.length) return;
-    setUploading("gallery");
-    const urls: string[] = [];
-    for (const f of files) {
-      const fd = new FormData();
-      fd.append("file", f);
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      const { url } = await res.json();
-      urls.push(url);
-    }
-    setUploading(null);
-    const existing = form.gallery.trim();
-    set("gallery", existing ? `${existing}\n${urls.join("\n")}` : urls.join("\n"));
-  }
-
+  // ── Submit — upload pending files first, then save ──
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
     setError("");
 
-    const payload = {
-      title:            form.title,
-      price:            parseFloat(form.price),
-      currency:         form.currency,
-      location:         form.location,
-      type:             form.type,
-      bedrooms:         parseInt(form.bedrooms),
-      bathrooms:        parseInt(form.bathrooms),
-      area:             parseFloat(form.area),
-      areaUnit:         form.areaUnit,
-      status:           form.status,
-      shortDescription: form.shortDescription,
-      fullDescription:  form.fullDescription,
-      mainImage:        form.mainImage,
-      gallery:          form.gallery.split("\n").map((s) => s.trim()).filter(Boolean),
-      featured:         form.featured,
-    };
-
-    const res = await fetch(
-      mode === "new" ? "/api/properties" : `/api/properties/${property!.id}`,
-      {
-        method: mode === "new" ? "POST" : "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+    try {
+      // 1. Upload main image if a new file was selected
+      let mainImageUrl = form.mainImage;
+      if (pendingMain) {
+        mainImageUrl = await uploadFile(pendingMain.file);
       }
-    );
 
-    setSaving(false);
-    if (res.ok) {
-      router.push("/admin/dashboard");
-      router.refresh();
-    } else {
-      setError("Something went wrong. Please try again.");
+      // 2. Upload new gallery files
+      const existingGalleryUrls = form.gallery
+        .split("\n")
+        .map((s) => s.trim())
+        .filter(Boolean);
+
+      const newGalleryUrls: string[] = [];
+      for (const { file } of pendingGallery) {
+        const url = await uploadFile(file);
+        newGalleryUrls.push(url);
+      }
+
+      const allGalleryUrls = [...existingGalleryUrls, ...newGalleryUrls];
+
+      // 3. Save property JSON
+      const payload = {
+        title:            form.title,
+        price:            parseFloat(form.price),
+        currency:         form.currency,
+        location:         form.location,
+        type:             form.type,
+        bedrooms:         parseInt(form.bedrooms),
+        bathrooms:        parseInt(form.bathrooms),
+        area:             parseFloat(form.area),
+        areaUnit:         form.areaUnit,
+        status:           form.status,
+        shortDescription: form.shortDescription,
+        fullDescription:  form.fullDescription,
+        mainImage:        mainImageUrl,
+        gallery:          allGalleryUrls,
+        featured:         form.featured,
+      };
+
+      const res = await fetch(
+        mode === "new" ? "/api/properties" : `/api/properties/${property!.id}`,
+        {
+          method: mode === "new" ? "POST" : "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (res.ok) {
+        router.push("/admin/dashboard");
+        router.refresh();
+      } else {
+        const body = await res.json().catch(() => ({}));
+        setError(body?.error ?? "Something went wrong. Please try again.");
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Failed to save. Check your GitHub token and try again.");
+    } finally {
+      setSaving(false);
     }
   }
 
   const inputFocus = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     (e.target.style.borderColor = "rgba(201,166,70,0.6)");
-  const inputBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+  const inputBlur  = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     (e.target.style.borderColor = "rgba(255,255,255,0.1)");
+
+  // Derived display values
+  const mainImageDisplay = pendingMain?.preview || form.mainImage;
+
+  const galleryPreviews: { src: string; isPending: boolean; idx: number }[] = [
+    ...form.gallery.split("\n").map((s) => s.trim()).filter(Boolean).map((src, idx) => ({
+      src, isPending: false, idx,
+    })),
+    ...pendingGallery.map(({ preview }, idx) => ({
+      src: preview, isPending: true, idx,
+    })),
+  ];
 
   return (
     <div style={{ minHeight: "100dvh" }}>
+
       {/* Top bar */}
       <header style={{
         height: "64px", display: "flex", alignItems: "center",
@@ -168,15 +216,13 @@ export default function PropertyForm({
       <main style={{ maxWidth: "800px", margin: "0 auto", padding: "2.5rem 1.5rem" }}>
         <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
 
-          {/* ── CARD wrapper ── */}
           {[
-            /* Basic info */
+            /* ── Basic Info ── */
             <div key="basic" style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
               <h3 style={{ fontFamily: "Zodiak,Georgia,serif", fontSize: "1.1rem", color: "#FFFFFF", paddingBottom: "0.875rem", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
                 Basic Information
               </h3>
 
-              {/* Title */}
               <div>
                 <label style={LABEL_STYLE}>Property Title *</label>
                 <input value={form.title} onChange={(e) => set("title", e.target.value)}
@@ -184,7 +230,6 @@ export default function PropertyForm({
                   style={FIELD_STYLE} onFocus={inputFocus} onBlur={inputBlur} />
               </div>
 
-              {/* Price + Currency */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 120px", gap: "1rem" }}>
                 <div>
                   <label style={LABEL_STYLE}>Price *</label>
@@ -196,12 +241,13 @@ export default function PropertyForm({
                   <label style={LABEL_STYLE}>Currency</label>
                   <select value={form.currency} onChange={(e) => set("currency", e.target.value)}
                     style={{ ...FIELD_STYLE, cursor: "pointer" }} onFocus={inputFocus} onBlur={inputBlur}>
-                    {["AED","USD","EUR","GBP"].map((c) => <option key={c} value={c} style={{ background: "#151b27" }}>{c}</option>)}
+                    {["AED","USD","EUR","GBP"].map((c) => (
+                      <option key={c} value={c} style={{ background: "#151b27" }}>{c}</option>
+                    ))}
                   </select>
                 </div>
               </div>
 
-              {/* Location */}
               <div>
                 <label style={LABEL_STYLE}>Location *</label>
                 <input value={form.location} onChange={(e) => set("location", e.target.value)}
@@ -209,13 +255,12 @@ export default function PropertyForm({
                   style={FIELD_STYLE} onFocus={inputFocus} onBlur={inputBlur} />
               </div>
 
-              {/* Type + Status */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
                 <div>
                   <label style={LABEL_STYLE}>Type *</label>
                   <select value={form.type} onChange={(e) => set("type", e.target.value)}
                     style={{ ...FIELD_STYLE, cursor: "pointer" }} onFocus={inputFocus} onBlur={inputBlur}>
-                    {["Apartment","Villa","Penthouse","Townhouse","Office","Studio"].map((t) => (
+                    {["Apartment","Villa","Penthouse","Townhouse","Duplex","Studio"].map((t) => (
                       <option key={t} value={t} style={{ background: "#151b27" }}>{t}</option>
                     ))}
                   </select>
@@ -225,27 +270,31 @@ export default function PropertyForm({
                   <select value={form.status} onChange={(e) => set("status", e.target.value)}
                     style={{ ...FIELD_STYLE, cursor: "pointer" }} onFocus={inputFocus} onBlur={inputBlur}>
                     {["available","sold","pending"].map((s) => (
-                      <option key={s} value={s} style={{ background: "#151b27" }}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
+                      <option key={s} value={s} style={{ background: "#151b27" }}>
+                        {s.charAt(0).toUpperCase() + s.slice(1)}
+                      </option>
                     ))}
                   </select>
                 </div>
               </div>
 
-              {/* Beds + Baths + Area */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 80px", gap: "1rem" }}>
                 <div>
                   <label style={LABEL_STYLE}>Bedrooms</label>
-                  <input type="number" min="0" value={form.bedrooms} onChange={(e) => set("bedrooms", e.target.value)}
+                  <input type="number" min="0" value={form.bedrooms}
+                    onChange={(e) => set("bedrooms", e.target.value)}
                     style={FIELD_STYLE} onFocus={inputFocus} onBlur={inputBlur} />
                 </div>
                 <div>
                   <label style={LABEL_STYLE}>Bathrooms *</label>
-                  <input type="number" min="1" value={form.bathrooms} onChange={(e) => set("bathrooms", e.target.value)}
+                  <input type="number" min="1" value={form.bathrooms}
+                    onChange={(e) => set("bathrooms", e.target.value)}
                     required style={FIELD_STYLE} onFocus={inputFocus} onBlur={inputBlur} />
                 </div>
                 <div>
                   <label style={LABEL_STYLE}>Area *</label>
-                  <input type="number" value={form.area} onChange={(e) => set("area", e.target.value)}
+                  <input type="number" value={form.area}
+                    onChange={(e) => set("area", e.target.value)}
                     required placeholder="e.g. 3500"
                     style={FIELD_STYLE} onFocus={inputFocus} onBlur={inputBlur} />
                 </div>
@@ -253,22 +302,21 @@ export default function PropertyForm({
                   <label style={LABEL_STYLE}>Unit</label>
                   <select value={form.areaUnit} onChange={(e) => set("areaUnit", e.target.value)}
                     style={{ ...FIELD_STYLE, cursor: "pointer" }} onFocus={inputFocus} onBlur={inputBlur}>
-                    {["sqft","sqm"].map((u) => <option key={u} value={u} style={{ background: "#151b27" }}>{u}</option>)}
+                    {["sqft","sqm"].map((u) => (
+                      <option key={u} value={u} style={{ background: "#151b27" }}>{u}</option>
+                    ))}
                   </select>
                 </div>
               </div>
 
               {/* Featured toggle */}
               <label style={{ display: "flex", alignItems: "center", gap: "0.75rem", cursor: "pointer" }}>
-                <div
-                  onClick={() => set("featured", !form.featured)}
-                  style={{
-                    width: "44px", height: "24px", borderRadius: "9999px",
-                    background: form.featured ? "#C9A646" : "rgba(255,255,255,0.1)",
-                    position: "relative", transition: "background 0.25s", flexShrink: 0,
-                    cursor: "pointer",
-                  }}
-                >
+                <div onClick={() => set("featured", !form.featured)} style={{
+                  width: "44px", height: "24px", borderRadius: "9999px",
+                  background: form.featured ? "#C9A646" : "rgba(255,255,255,0.1)",
+                  position: "relative", transition: "background 0.25s",
+                  flexShrink: 0, cursor: "pointer",
+                }}>
                   <div style={{
                     position: "absolute", top: "3px",
                     left: form.featured ? "23px" : "3px",
@@ -281,7 +329,7 @@ export default function PropertyForm({
               </label>
             </div>,
 
-            /* Descriptions */
+            /* ── Descriptions ── */
             <div key="desc" style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
               <h3 style={{ fontFamily: "Zodiak,Georgia,serif", fontSize: "1.1rem", color: "#FFFFFF", paddingBottom: "0.875rem", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
                 Descriptions
@@ -289,7 +337,8 @@ export default function PropertyForm({
 
               <div>
                 <label style={LABEL_STYLE}>Short Description * (shown on cards)</label>
-                <textarea value={form.shortDescription} onChange={(e) => set("shortDescription", e.target.value)}
+                <textarea value={form.shortDescription}
+                  onChange={(e) => set("shortDescription", e.target.value)}
                   required rows={3} placeholder="Brief summary shown on listing cards…"
                   style={{ ...FIELD_STYLE, height: "auto", padding: "0.875rem 1rem", resize: "vertical" }}
                   onFocus={inputFocus} onBlur={inputBlur} />
@@ -297,23 +346,28 @@ export default function PropertyForm({
 
               <div>
                 <label style={LABEL_STYLE}>Full Description (shown on detail page)</label>
-                <textarea value={form.fullDescription} onChange={(e) => set("fullDescription", e.target.value)}
+                <textarea value={form.fullDescription}
+                  onChange={(e) => set("fullDescription", e.target.value)}
                   rows={8} placeholder="Full property description with all details…"
                   style={{ ...FIELD_STYLE, height: "auto", padding: "0.875rem 1rem", resize: "vertical" }}
                   onFocus={inputFocus} onBlur={inputBlur} />
               </div>
             </div>,
 
-            /* Images */
+            /* ── Images ── */
             <div key="images" style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
               <h3 style={{ fontFamily: "Zodiak,Georgia,serif", fontSize: "1.1rem", color: "#FFFFFF", paddingBottom: "0.875rem", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
                 Images
+                <span style={{ fontSize: "0.7rem", fontWeight: 400, color: "#6B7280", marginLeft: "0.75rem", letterSpacing: "0.05em", textTransform: "none", fontFamily: "inherit" }}>
+                  — previews shown locally, uploaded only when you click Save
+                </span>
               </h3>
 
               {/* Main image */}
               <div>
                 <label style={LABEL_STYLE}>Main Image</label>
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+
                   <label style={{
                     display: "flex", alignItems: "center", justifyContent: "center",
                     height: "2.75rem", borderRadius: "0.75rem",
@@ -322,27 +376,37 @@ export default function PropertyForm({
                     fontSize: "0.85rem", color: "#C9A646", fontWeight: 600,
                     transition: "background 0.2s",
                   }}>
-                    {uploading === "main" ? "Uploading…" : "📷 Upload Main Image"}
-                    <input type="file" accept="image/*" onChange={handleMainImageUpload} style={{ display: "none" }} />
+                    {pendingMain ? "✓ Image selected — will upload on Save" : "📷 Select Main Image"}
+                    <input type="file" accept="image/*" onChange={handleMainImageSelect} style={{ display: "none" }} />
                   </label>
 
-                  {/* Or URL */}
-                  <input value={form.mainImage} onChange={(e) => set("mainImage", e.target.value)}
+                  <input value={form.mainImage} onChange={(e) => { set("mainImage", e.target.value); setPendingMain(null); }}
                     placeholder="Or paste image URL here"
                     style={FIELD_STYLE} onFocus={inputFocus} onBlur={inputBlur} />
 
-                  {/* Preview */}
-                  {form.mainImage && (
+                  {mainImageDisplay && (
                     <div style={{ position: "relative", borderRadius: "0.75rem", overflow: "hidden", height: "160px", border: "1px solid rgba(201,166,70,0.2)" }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={form.mainImage} alt="Preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                      <button type="button" onClick={() => set("mainImage", "")} style={{
-                        position: "absolute", top: "8px", right: "8px",
-                        width: "28px", height: "28px", borderRadius: "9999px",
-                        background: "rgba(0,0,0,0.7)", color: "#FFFFFF",
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        cursor: "pointer", border: "none", fontSize: "14px",
-                      }}>✕</button>
+                      <img src={mainImageDisplay} alt="Preview"
+                        style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      {pendingMain && (
+                        <div style={{
+                          position: "absolute", top: "8px", left: "8px",
+                          background: "rgba(201,166,70,0.9)", color: "#0B0F19",
+                          fontSize: "0.65rem", fontWeight: 700,
+                          padding: "2px 8px", borderRadius: "9999px", letterSpacing: "0.08em",
+                        }}>
+                          PENDING UPLOAD
+                        </div>
+                      )}
+                      <button type="button" onClick={() => { setPendingMain(null); set("mainImage", ""); }}
+                        style={{
+                          position: "absolute", top: "8px", right: "8px",
+                          width: "28px", height: "28px", borderRadius: "9999px",
+                          background: "rgba(0,0,0,0.7)", color: "#FFFFFF",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          cursor: "pointer", border: "none", fontSize: "14px",
+                        }}>✕</button>
                     </div>
                   )}
                 </div>
@@ -352,6 +416,7 @@ export default function PropertyForm({
               <div>
                 <label style={LABEL_STYLE}>Gallery Images</label>
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+
                   <label style={{
                     display: "flex", alignItems: "center", justifyContent: "center",
                     height: "2.75rem", borderRadius: "0.75rem",
@@ -359,22 +424,53 @@ export default function PropertyForm({
                     background: "rgba(255,255,255,0.03)", cursor: "pointer",
                     fontSize: "0.85rem", color: "#9CA3AF", fontWeight: 600,
                   }}>
-                    {uploading === "gallery" ? "Uploading…" : "🖼 Upload Gallery Images (multiple)"}
-                    <input type="file" accept="image/*" multiple onChange={handleGalleryUpload} style={{ display: "none" }} />
+                    {pendingGallery.length > 0
+                      ? `✓ ${pendingGallery.length} image${pendingGallery.length > 1 ? "s" : ""} selected — will upload on Save`
+                      : "🖼 Select Gallery Images (multiple)"}
+                    <input type="file" accept="image/*" multiple onChange={handleGallerySelect} style={{ display: "none" }} />
                   </label>
 
                   <textarea value={form.gallery} onChange={(e) => set("gallery", e.target.value)}
-                    rows={4} placeholder="Or paste image URLs, one per line…"
+                    rows={3} placeholder="Or paste image URLs, one per line…"
                     style={{ ...FIELD_STYLE, height: "auto", padding: "0.875rem 1rem", resize: "vertical", fontSize: "0.8rem" }}
                     onFocus={inputFocus} onBlur={inputBlur} />
 
-                  {/* Gallery preview */}
-                  {form.gallery.trim() && (
+                  {/* Gallery previews */}
+                  {galleryPreviews.length > 0 && (
                     <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-                      {form.gallery.split("\n").filter(Boolean).map((url, i) => (
-                        <div key={i} style={{ width: "72px", height: "56px", borderRadius: "0.5rem", overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)" }}>
+                      {galleryPreviews.map(({ src, isPending, idx }) => (
+                        <div key={`${isPending ? "p" : "e"}-${idx}`} style={{
+                          position: "relative", width: "80px", height: "64px",
+                          borderRadius: "0.5rem", overflow: "hidden",
+                          border: isPending
+                            ? "1px solid rgba(201,166,70,0.5)"
+                            : "1px solid rgba(255,255,255,0.08)",
+                        }}>
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={url.trim()} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                          <img src={src} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                          {isPending && (
+                            <div style={{
+                              position: "absolute", bottom: 0, left: 0, right: 0,
+                              background: "rgba(201,166,70,0.85)", fontSize: "0.55rem",
+                              fontWeight: 700, color: "#0B0F19", textAlign: "center",
+                              padding: "1px 0", letterSpacing: "0.04em",
+                            }}>NEW</div>
+                          )}
+                          <button type="button" onClick={() => {
+                            if (isPending) {
+                              setPendingGallery((prev) => prev.filter((_, i) => i !== idx));
+                            } else {
+                              const lines = form.gallery.split("\n").filter(Boolean);
+                              lines.splice(idx, 1);
+                              set("gallery", lines.join("\n"));
+                            }
+                          }} style={{
+                            position: "absolute", top: "3px", right: "3px",
+                            width: "18px", height: "18px", borderRadius: "9999px",
+                            background: "rgba(0,0,0,0.75)", color: "#FFFFFF",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            cursor: "pointer", border: "none", fontSize: "10px",
+                          }}>✕</button>
                         </div>
                       ))}
                     </div>
@@ -404,6 +500,24 @@ export default function PropertyForm({
             </div>
           )}
 
+          {/* Pending upload notice */}
+          {(pendingMain || pendingGallery.length > 0) && !saving && (
+            <div style={{
+              padding: "0.875rem 1rem", borderRadius: "0.75rem",
+              background: "rgba(201,166,70,0.08)", border: "1px solid rgba(201,166,70,0.25)",
+              color: "#C9A646", fontSize: "0.85rem",
+              display: "flex", alignItems: "center", gap: "0.5rem",
+            }}>
+              <span>⏳</span>
+              <span>
+                {[
+                  pendingMain && "1 main image",
+                  pendingGallery.length > 0 && `${pendingGallery.length} gallery image${pendingGallery.length > 1 ? "s" : ""}`,
+                ].filter(Boolean).join(" + ")} ready — will be uploaded when you click Save.
+              </span>
+            </div>
+          )}
+
           {/* Actions */}
           <div style={{ display: "flex", gap: "0.875rem" }}>
             <button
@@ -411,13 +525,22 @@ export default function PropertyForm({
               className="btn-gold-hover"
               style={{
                 flex: 1, display: "flex", alignItems: "center", justifyContent: "center",
+                gap: "0.5rem",
                 minHeight: "3rem", borderRadius: "9999px",
                 background: "linear-gradient(135deg,#d4aa4a,#C9A646,#b8922e)",
                 color: "#0B0F19", fontWeight: 700, fontSize: "0.9rem",
                 opacity: saving ? 0.7 : 1, cursor: saving ? "not-allowed" : "pointer",
               }}
             >
-              {saving ? "Saving…" : mode === "new" ? "Create Property" : "Save Changes"}
+              {saving ? (
+                <>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+                    style={{ animation: "spin 1s linear infinite" }}>
+                    <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                  </svg>
+                  Uploading & Saving…
+                </>
+              ) : mode === "new" ? "Create Property" : "Save Changes"}
             </button>
             <Link href="/admin/dashboard" style={{
               display: "inline-flex", alignItems: "center", justifyContent: "center",
@@ -429,6 +552,11 @@ export default function PropertyForm({
               Cancel
             </Link>
           </div>
+
+          <style>{`
+            @keyframes spin { to { transform: rotate(360deg); } }
+          `}</style>
+
         </form>
       </main>
     </div>
