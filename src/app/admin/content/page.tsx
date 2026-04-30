@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { uploadToCloudinary } from "@/lib/cloudinary";
+
 
 const FIELD = {
   width: "100%", height: "2.75rem", padding: "0 1rem",
@@ -105,17 +107,19 @@ setAboutCredentials(ab.credentials ?? aboutCredentials);
       });
   }, []);
 
-  async function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploading(true);
-    const fd = new FormData();
-    fd.append("file", file);
-    const res = await fetch("/api/upload", { method: "POST", body: fd });
-    const { url } = await res.json();
+ async function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  setUploading(true);
+  try {
+    const url = await uploadToCloudinary(file);
     setPhoto(url);
+  } catch {
+    alert("Photo upload failed. Check Cloudinary settings.");
+  } finally {
     setUploading(false);
   }
+}
 
   function updateStat(i: number, key: "value" | "label", val: string) {
     setStats(prev => prev.map((s, idx) => idx === i ? { ...s, [key]: val } : s));

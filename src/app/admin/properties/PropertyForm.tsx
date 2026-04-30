@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Property } from "@/lib/types";
+import { uploadToCloudinary } from "@/lib/cloudinary";
+
 
 const FIELD_STYLE = {
   width: "100%", height: "2.75rem", padding: "0 1rem",
@@ -90,15 +92,11 @@ export default function PropertyForm({
     e.target.value = "";
   }
 
-  // ── Upload a single file to GitHub via API ──
+
+// Image Upload
   async function uploadFile(file: File): Promise<string> {
-    const fd = new FormData();
-    fd.append("file", file);
-    const res = await fetch("/api/upload", { method: "POST", body: fd });
-    if (!res.ok) throw new Error("Upload failed");
-    const { url } = await res.json();
-    return url as string;
-  }
+  return await uploadToCloudinary(file);
+}
 
   // ── Submit — upload pending files first, then save ──
   async function handleSubmit(e: React.FormEvent) {
