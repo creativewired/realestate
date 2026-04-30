@@ -66,28 +66,6 @@
     "createdAt": "2025-02-20T10:00:00Z"
   },
   {
-    "id": "prop-004",
-    "title": "Arabian Ranches Golf Villa",
-    "price": 6800000,
-    "currency": "AED",
-    "location": "Arabian Ranches, Dubai",
-    "type": "Villa",
-    "bedrooms": 4,
-    "bathrooms": 5,
-    "area": 5200,
-    "areaUnit": "sqft",
-    "shortDescription": "Spacious family villa backing the golf course with private pool.",
-    "fullDescription": "A stunning four-bedroom villa located in the prestigious Arabian Ranches community, directly overlooking the championship golf course. This home features a private pool, landscaped garden, maids room, and a double garage. The interior showcases high ceilings, an open-plan kitchen and family room, and a formal dining area — perfect for families who value space, privacy, and community living.",
-    "mainImage": "/images/properties/prop-004-main.jpg",
-    "gallery": [
-      "/images/properties/prop-004-1.jpg",
-      "/images/properties/prop-004-2.jpg"
-    ],
-    "status": "sold",
-    "featured": false,
-    "createdAt": "2025-03-05T10:00:00Z"
-  },
-  {
     "id": "prop-005",
     "title": "Business Bay Luxury Studio",
     "price": 950000,
