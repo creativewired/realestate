@@ -24,21 +24,20 @@
   {
     "id": "prop-002",
     "title": "Downtown Penthouse with Burj View",
-    "price": 8900000,
+    "price": 8099998,
     "currency": "AED",
     "location": "Downtown Dubai",
     "type": "Penthouse",
-    "bedrooms": 3,
+    "bedrooms": 5,
     "bathrooms": 4,
     "area": 4200,
     "areaUnit": "sqft",
     "shortDescription": "Exclusive penthouse with full Burj Khalifa and Dubai Fountain views.",
     "fullDescription": "A breathtaking penthouse residence in the heart of Downtown Dubai. Wake up to spectacular views of the Burj Khalifa and Dubai Fountain from every room. Features a private rooftop terrace, designer kitchen with Gaggenau appliances, and floor-to-ceiling windows that flood every space with natural light. Includes two dedicated parking spaces and private storage.",
-    "mainImage": "/images/properties/prop-002-main.jpg",
+    "mainImage": "https://res.cloudinary.com/dna2rsra9/image/upload/v1777562720/luxury-re/properties/sget7vd5jm2a9irhsg0e.webp",
     "gallery": [
-      "/images/properties/prop-002-1.jpg",
-      "/images/properties/prop-002-2.jpg",
-      "/images/properties/prop-002-3.jpg"
+      "https://res.cloudinary.com/dna2rsra9/image/upload/v1777562721/luxury-re/properties/toy0ysr1czl4dpkn089c.webp",
+      "https://res.cloudinary.com/dna2rsra9/image/upload/v1777562722/luxury-re/properties/pqifhclad3zwcr5ddehi.jpg"
     ],
     "status": "available",
     "featured": true,
