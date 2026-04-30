@@ -1,0 +1,110 @@
+{
+  "agent": {
+    "name": "Swaraj N S",
+    "photo": "/images/properties/1777551178378-kdwmfr57e5.jpg",
+    "bio": "With over 12 years of experience in Dubai's luxury real estate market, Swaraj specializes in high-end villas, penthouses, and waterfront properties. Her deep market knowledge, extensive network, and personalized white-glove approach have helped hundreds of discerning clients find their perfect home or investment property in Dubai.",
+    "phone": "+971555207899",
+    "whatsapp": "+971555207899",
+    "email": "swaraj@luxuryrealestate.ae",
+    "specialization": "Luxury Villas & Penthouses",
+    "experience": 12,
+    "city": "Dubai"
+  },
+  "homepage": {
+    "heroTitle": "Find Your Dream Property in Dubai",
+    "heroSubtitle": "Exclusive luxury properties handpicked by Dubai's most trusted real estate specialist",
+    "stats": [
+      {
+        "label": "Properties Sold",
+        "value": "500+"
+      },
+      {
+        "label": "Years Experience",
+        "value": "12+"
+      },
+      {
+        "label": "Happy Clients",
+        "value": "350+"
+      },
+      {
+        "label": "AED in Sales",
+        "value": "2B+"
+      }
+    ]
+  },
+  "about": {
+    "headline": "A Trusted Name in Dubai Luxury Real Estate",
+    "subheadline": "Dedicated to finding you the perfect property with discretion, expertise, and a personal touch.",
+    "story": "With over a decade of experience in Dubai's luxury property market, I have built a reputation for delivering exceptional results for buyers, sellers, and investors. My deep knowledge of premium communities — from Palm Jumeirah to Downtown Dubai — means you always have an insider advantage.\n\nI believe buying or selling a home is one of the most significant decisions in your life. That's why I offer a truly personalised service — listening carefully to your needs, guiding you through every step, and ensuring complete transparency from the first viewing to the final signature.",
+    "highlights": [
+      {
+        "icon": "🏆",
+        "title": "250+ Properties Sold",
+        "description": "Proven track record across Dubai's most prestigious communities."
+      },
+      {
+        "icon": "🤝",
+        "title": "Personal Service",
+        "description": "Direct contact with me at every stage — no handoffs, no middlemen."
+      },
+      {
+        "icon": "📍",
+        "title": "Local Expertise",
+        "description": "Deep knowledge of every luxury community in Dubai."
+      },
+      {
+        "icon": "💼",
+        "title": "End-to-End Support",
+        "description": "From search to keys — legal, mortgage, and handover guidance included."
+      }
+    ],
+    "services": [
+      {
+        "title": "Luxury Sales",
+        "description": "Villas, penthouses, and apartments in Dubai's most exclusive addresses."
+      },
+      {
+        "title": "Investment Advisory",
+        "description": "ROI-focused guidance for off-plan and ready property investments."
+      },
+      {
+        "title": "Buyer Representation",
+        "description": "Dedicated search and negotiation on your behalf at no extra cost."
+      },
+      {
+        "title": "Property Valuation",
+        "description": "Accurate, data-driven valuations for sales and portfolio purposes."
+      }
+    ],
+    "credentials": [
+      {
+        "label": "Experience",
+        "value": "10+ Years"
+      },
+      {
+        "label": "Transactions",
+        "value": "200+ Deals"
+      },
+      {
+        "label": "Specialization",
+        "value": "Luxury & Ultra-Luxury"
+      },
+      {
+        "label": "Languages",
+        "value": "English, Arabic"
+      },
+      {
+        "label": "Markets",
+        "value": "Dubai, Abu Dhabi"
+      },
+      {
+        "label": "License",
+        "value": "RERA Certified"
+      }
+    ]
+  },
+  "seo": {
+    "siteName": "Luxury Real Estate Dubai, UAE",
+    "siteDescription": "Discover exclusive luxury properties in Dubai — villas, penthouses, and apartments in prime locations."
+  }
+}

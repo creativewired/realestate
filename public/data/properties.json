@@ -1,0 +1,134 @@
+[
+  {
+    "id": "prop-001",
+    "title": "Luxury Palm Jumeirah Villa",
+    "price": 12500000,
+    "currency": "AED",
+    "location": "Palm Jumeirah, Dubai",
+    "type": "villa",
+    "bedrooms": 5,
+    "bathrooms": 6,
+    "area": 8500,
+    "areaUnit": "sqft",
+    "shortDescription": "Stunning beachfront villa with private pool and panoramic sea views.",
+    "fullDescription": "This magnificent five-bedroom villa sits on the iconic Palm Jumeirah, offering unobstructed views of the Arabian Gulf. Featuring a private infinity pool, home cinema, smart home system, and direct beach access. The villa boasts Italian marble flooring, custom-designed kitchen, and a beautifully landscaped garden perfect for entertaining.",
+    "mainImage": "/images/properties/1777548666915-a09zmlmyf7.jpg",
+    "gallery": [
+      "/images/properties/1777548674022-mcdoxicglfa.jpg",
+      "/images/properties/1777548674044-4ene9anom51.jpg"
+    ],
+    "status": "available",
+    "featured": true,
+    "createdAt": "2025-01-15T10:00:00Z"
+  },
+  {
+    "id": "prop-002",
+    "title": "Downtown Penthouse with Burj View",
+    "price": 8900000,
+    "currency": "AED",
+    "location": "Downtown Dubai",
+    "type": "Penthouse",
+    "bedrooms": 3,
+    "bathrooms": 4,
+    "area": 4200,
+    "areaUnit": "sqft",
+    "shortDescription": "Exclusive penthouse with full Burj Khalifa and Dubai Fountain views.",
+    "fullDescription": "A breathtaking penthouse residence in the heart of Downtown Dubai. Wake up to spectacular views of the Burj Khalifa and Dubai Fountain from every room. Features a private rooftop terrace, designer kitchen with Gaggenau appliances, and floor-to-ceiling windows that flood every space with natural light. Includes two dedicated parking spaces and private storage.",
+    "mainImage": "/images/properties/prop-002-main.jpg",
+    "gallery": [
+      "/images/properties/prop-002-1.jpg",
+      "/images/properties/prop-002-2.jpg",
+      "/images/properties/prop-002-3.jpg"
+    ],
+    "status": "available",
+    "featured": true,
+    "createdAt": "2025-02-01T10:00:00Z"
+  },
+  {
+    "id": "prop-003",
+    "title": "Dubai Marina Waterfront Apartment",
+    "price": 3200000,
+    "currency": "AED",
+    "location": "Dubai Marina",
+    "type": "Apartment",
+    "bedrooms": 2,
+    "bathrooms": 3,
+    "area": 1850,
+    "areaUnit": "sqft",
+    "shortDescription": "Modern 2-bedroom apartment with direct marina and sea views.",
+    "fullDescription": "A beautifully designed two-bedroom apartment in one of Dubai Marina's most sought-after towers. Enjoy stunning marina and sea views from your private balcony. The open-plan living area features premium finishes, a fully fitted kitchen, and smart home automation. Walking distance to the Marina Walk, restaurants, and the beach.",
+    "mainImage": "/images/properties/prop-003-main.jpg",
+    "gallery": [
+      "/images/properties/prop-003-1.jpg",
+      "/images/properties/prop-003-2.jpg"
+    ],
+    "status": "available",
+    "featured": false,
+    "createdAt": "2025-02-20T10:00:00Z"
+  },
+  {
+    "id": "prop-004",
+    "title": "Arabian Ranches Golf Villa",
+    "price": 6800000,
+    "currency": "AED",
+    "location": "Arabian Ranches, Dubai",
+    "type": "Villa",
+    "bedrooms": 4,
+    "bathrooms": 5,
+    "area": 5200,
+    "areaUnit": "sqft",
+    "shortDescription": "Spacious family villa backing the golf course with private pool.",
+    "fullDescription": "A stunning four-bedroom villa located in the prestigious Arabian Ranches community, directly overlooking the championship golf course. This home features a private pool, landscaped garden, maids room, and a double garage. The interior showcases high ceilings, an open-plan kitchen and family room, and a formal dining area — perfect for families who value space, privacy, and community living.",
+    "mainImage": "/images/properties/prop-004-main.jpg",
+    "gallery": [
+      "/images/properties/prop-004-1.jpg",
+      "/images/properties/prop-004-2.jpg"
+    ],
+    "status": "sold",
+    "featured": false,
+    "createdAt": "2025-03-05T10:00:00Z"
+  },
+  {
+    "id": "prop-005",
+    "title": "Business Bay Luxury Studio",
+    "price": 950000,
+    "currency": "AED",
+    "location": "Business Bay, Dubai",
+    "type": "Apartment",
+    "bedrooms": 0,
+    "bathrooms": 1,
+    "area": 520,
+    "areaUnit": "sqft",
+    "shortDescription": "High-floor studio with canal views in the heart of Business Bay.",
+    "fullDescription": "A sleek, fully furnished studio on a high floor in Business Bay with unobstructed Dubai Canal views. Perfect as a first home or investment property. Features include a fitted kitchen, built-in wardrobe, and access to a rooftop pool, gym, and concierge services. Minutes from the Dubai Metro and major business hubs.",
+    "mainImage": "/images/properties/prop-005-main.jpg",
+    "gallery": [
+      "/images/properties/prop-005-1.jpg"
+    ],
+    "status": "pending",
+    "featured": false,
+    "createdAt": "2025-03-18T10:00:00Z"
+  },
+  {
+    "id": "prop-006",
+    "title": "Jumeirah Townhouse with Garden",
+    "price": 4400000,
+    "currency": "AED",
+    "location": "Jumeirah, Dubai",
+    "type": "Townhouse",
+    "bedrooms": 3,
+    "bathrooms": 4,
+    "area": 3100,
+    "areaUnit": "sqft",
+    "shortDescription": "Elegant 3-bedroom townhouse with private garden in Jumeirah.",
+    "fullDescription": "A charming three-bedroom townhouse nestled in the quiet, tree-lined streets of Jumeirah. This property offers a private walled garden, a rooftop terrace, and a fully upgraded interior with bespoke joinery and designer fixtures. Located minutes from the beach, top schools, and Jumeirah's best cafés and boutiques. An ideal family home in one of Dubai's most desirable residential areas.",
+    "mainImage": "/images/properties/prop-006-main.jpg",
+    "gallery": [
+      "/images/properties/prop-006-1.jpg",
+      "/images/properties/prop-006-2.jpg"
+    ],
+    "status": "available",
+    "featured": true,
+    "createdAt": "2025-04-01T10:00:00Z"
+  }
+]

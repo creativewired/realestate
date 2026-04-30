@@ -1,26 +1,243 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100dvh;
+  background-color: #0B0F19;
+  color: #FFFFFF;
+  font-family: "Satoshi", system-ui, sans-serif;
+  font-size: 1rem;
+  line-height: 1.65;
 }
+
+h1, h2, h3, h4 {
+  font-family: "Zodiak", "Georgia", serif;
+  text-wrap: balance;
+  line-height: 1.08;
+}
+
+p { text-wrap: pretty; }
+
+img, video { display: block; max-width: 100%; }
+
+a { text-decoration: none; color: inherit; }
+
+button {
+  cursor: pointer;
+  background: none;
+  border: none;
+  font: inherit;
+  color: inherit;
+}
+
+input, textarea, select {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid #C9A646;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.section-pad {
+  padding-top: 6rem;
+  padding-bottom: 6rem;
+}
+
+@media (max-width: 768px) {
+  .section-pad {
+    padding-top: 3.5rem;
+    padding-bottom: 3.5rem;
+  }
+}
+
+/* ── Hero grid ── */
+.hero-grid {
+  display: grid;
+  gap: 3rem;
+  align-items: center;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 960px) {
+  .hero-grid {
+    grid-template-columns: 1.1fr 0.9fr;
+  }
+  .hero-text {
+    order: -1;
+  }
+}
+
+/* ── About grid ── */
+.about-grid {
+  display: grid;
+  gap: 4rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 960px) {
+  .about-grid {
+    grid-template-columns: 0.7fr 1.3fr;
+  }
+}
+
+/* ── Animations ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.anim-fade-up {
+  opacity: 0;
+  animation: fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.anim-fade-in {
+  opacity: 0;
+  animation: fadeIn 0.6s ease forwards;
+}
+
+.anim-scale-in {
+  opacity: 0;
+  animation: scaleIn 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.35s; }
+.delay-4 { animation-delay: 0.5s; }
+.delay-5 { animation-delay: 0.65s; }
+.delay-6 { animation-delay: 0.8s; }
+
+/* ── Card hover lift ── */
+.card-hover {
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.card-hover:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 48px rgba(0,0,0,0.45);
+}
+
+/* ── Button hover states ── */
+.btn-gold-hover {
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+.btn-gold-hover:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+.btn-outline-hover {
+  transition: background 180ms ease, transform 180ms ease;
+}
+.btn-outline-hover:hover {
+  background: rgba(255,255,255,0.07) !important;
+  transform: translateY(-1px);
+}
+
+/* ── Scroll reveal ── */
+.reveal {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.js-ready .reveal {
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+.js-ready .reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: #0B0F19; }
+::-webkit-scrollbar-thumb { background: #C9A646; border-radius: 9999px; }
+
+/* ── Section label ── */
+.section-label {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: #C9A646;
+  margin-bottom: 1rem;
+}
+
+/* ── Gold divider ── */
+.gold-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201,166,70,0.35), transparent);
+}
+
+/* ── Property card image zoom ── */
+.property-card-img {
+  transition: transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.property-card:hover .property-card-img {
+  transform: scale(1.04);
+}
+
+/* ── Mobile nav helpers ── */
+@media (max-width: 768px) {
+  .desktop-nav { display: none !important; }
+}
+@media (min-width: 769px) {
+  .mobile-menu-btn { display: none !important; }
+}
+/* ── Property detail page ── */
+.breadcrumb-link {
+  color: #6B7280;
+  transition: color 0.2s;
+}
+.breadcrumb-link:hover { color: #C9A646; }
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #6B7280;
+  font-size: 0.85rem;
+  transition: color 0.2s;
+}
+.back-link:hover { color: #C9A646; }
