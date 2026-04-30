@@ -49,10 +49,10 @@ export default function Navbar({ agent }: { agent?: Agent }) {
         <Link href="/" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none" }}>
           <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
             <polygon points="18,2 34,10 34,26 18,34 2,26 2,10" stroke="#C9A646" strokeWidth="1.5" fill="none"/>
-            <text x="18" y="22" textAnchor="middle" fill="#C9A646" fontSize="10" fontFamily="serif" fontWeight="600">LR</text>
+            <text x="18" y="22" textAnchor="middle" fill="#C9A646" fontSize="10" fontFamily="serif" fontWeight="600">NS</text>
           </svg>
           <span style={{ fontFamily: "Zodiak, Georgia, serif", color: "#FFFFFF", fontSize: "1.1rem", fontWeight: 400 }}>
-            Luxury<span style={{ color: "#C9A646" }}> RE</span>
+            Swaraj<span style={{ color: "#C9A646" }}> N S</span>
           </span>
         </Link>
 

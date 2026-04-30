@@ -27,7 +27,7 @@ export default function Footer({ agent, content }: { agent?: Agent; content?: Si
                 <text x="18" y="22" textAnchor="middle" fill="#C9A646" fontSize="10" fontFamily="serif" fontWeight="600">LR</text>
               </svg>
               <span style={{ fontFamily: "Zodiak, Georgia, serif", color: "#FFFFFF", fontSize: "1rem" }}>
-                Luxury RE
+                Swaraj N S
               </span>
             </div>
             <p style={{ color: "#6B7280", fontSize: "0.875rem", lineHeight: 1.7, maxWidth: "260px" }}>

@@ -57,7 +57,7 @@ const FALLBACK_CONTENT: SiteContent = {
     ],
   },
   seo: {
-    siteName: 'Luxury RE',
+    siteName: 'Swaraj N S',
     siteDescription: 'Exclusive luxury real estate in Dubai.',
   },
 } as SiteContent;

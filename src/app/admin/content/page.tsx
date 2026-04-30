@@ -424,7 +424,7 @@ function updateCredential(i: number, key: keyof typeof aboutCredentials[0], val:
             <div style={{ display: "flex", flexDirection: "column", gap: "1.125rem" }}>
               <div>
                 <label style={LABEL}>Site Name</label>
-                <input value={siteName} onChange={e => setSiteName(e.target.value)} placeholder="e.g. Luxury RE" style={FIELD} onFocus={focus} onBlur={blur} />
+                <input value={siteName} onChange={e => setSiteName(e.target.value)} placeholder="e.g. Swaraj N S" style={FIELD} onFocus={focus} onBlur={blur} />
               </div>
               <div>
                 <label style={LABEL}>Site Description (SEO)</label>

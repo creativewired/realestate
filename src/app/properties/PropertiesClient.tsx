@@ -19,6 +19,8 @@ const STATUS_STYLE: Record<string, { bg: string; border: string; color: string }
   pending:   { bg: "rgba(201,166,70,0.15)",  border: "rgba(201,166,70,0.4)",  color: "#C9A646" },
 };
 
+
+
 // ── Property Card ─────────────────────────────────────────────────────────────
 
 function PropertyCard({ property, agentName, agentPhone }: {
@@ -228,6 +230,7 @@ export default function PropertiesClient({
   const [type,    setType]    = useState("All");
   const [status,  setStatus]  = useState("All");
   const [sort,    setSort]    = useState("default");
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const filtered = useMemo(() => {
     let list = [...properties];
@@ -261,6 +264,7 @@ export default function PropertiesClient({
   return (
     <>
       {/* ── Hero banner ───────────────────────────────── */}
+      
       <section style={{
         paddingTop: "8rem", paddingBottom: "4rem",
         background: "linear-gradient(180deg,rgba(201,166,70,0.05) 0%,transparent 100%)",
@@ -305,140 +309,250 @@ export default function PropertiesClient({
         </div>
       </section>
 
-      {/* ── Filters ───────────────────────────────────── */}
-      <section style={{
-        position: "sticky", top: "72px", zIndex: 30,
-        background: "rgba(11,15,25,0.92)",
-        backdropFilter: "blur(16px)",
-        borderBottom: "1px solid rgba(255,255,255,0.07)",
-        padding: "1rem 0",
+{/* ── Filters ── */}
+
+<section style={{
+  position: "sticky", top: "72px", zIndex: 30,
+  background: "rgba(11,15,25,0.92)",
+  backdropFilter: "blur(16px)",
+  borderBottom: "1px solid rgba(255,255,255,0.07)",
+  padding: "1rem 0",
+}}>
+  <div className="container">
+
+    {/* ── DESKTOP ── */}
+    <div className="filter-desktop" style={{ display: "flex", flexWrap: "wrap", gap: "0.875rem", alignItems: "center" }}>
+
+      {/* Search */}
+      <div style={{ position: "relative", flexGrow: 1, minWidth: "200px", maxWidth: "280px" }}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2"
+          style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input
+          value={search} onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search properties…"
+          style={{
+            width: "100%", paddingLeft: "2.25rem", paddingRight: "0.875rem",
+            height: "2.5rem", borderRadius: "9999px",
+            border: "1px solid rgba(255,255,255,0.1)",
+            background: "rgba(255,255,255,0.05)", color: "#FFFFFF",
+            fontSize: "0.85rem", outline: "none", transition: "border-color 0.2s",
+          }}
+          onFocus={(e) => (e.target.style.borderColor = "rgba(201,166,70,0.5)")}
+          onBlur={(e)  => (e.target.style.borderColor = "rgba(255,255,255,0.1)")}
+        />
+      </div>
+
+      {/* Type chips */}
+      <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+        {ALL_TYPES.map((t) => (
+          <Chip key={t} label={t} active={type === t} onClick={() => setType(t)} />
+        ))}
+      </div>
+
+      <div style={{ width: "1px", height: "28px", background: "rgba(255,255,255,0.08)" }} />
+
+      {/* Status chips */}
+      <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+        {ALL_STATUS.map((s) => (
+          <Chip key={s} label={s} active={status === s} onClick={() => setStatus(s)} />
+        ))}
+      </div>
+
+      {/* Sort */}
+      <select value={sort} onChange={(e) => setSort(e.target.value)} style={{
+        marginLeft: "auto", height: "2.5rem", padding: "0 1rem",
+        borderRadius: "9999px", border: "1px solid rgba(255,255,255,0.1)",
+        background: "rgba(255,255,255,0.05)", color: "#D1D5DB",
+        fontSize: "0.8rem", cursor: "pointer", outline: "none",
       }}>
-        <div className="container">
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.875rem", alignItems: "center" }}>
+        {SORT_OPTIONS.map((o) => (
+          <option key={o.value} value={o.value} style={{ background: "#151b27" }}>{o.label}</option>
+        ))}
+      </select>
+    </div>
 
-            {/* Search */}
-            <div style={{ position: "relative", flexGrow: 1, minWidth: "200px", maxWidth: "280px" }}>
-              <svg
-                width="14" height="14" viewBox="0 0 24 24" fill="none"
-                stroke="#6B7280" strokeWidth="2"
-                style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}
-              >
-                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-              </svg>
-              <input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search properties…"
-                style={{
-                  width: "100%", paddingLeft: "2.25rem", paddingRight: "0.875rem",
-                  height: "2.5rem", borderRadius: "9999px",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  background: "rgba(255,255,255,0.05)", color: "#FFFFFF",
-                  fontSize: "0.85rem", outline: "none",
-                  transition: "border-color 0.2s",
-                }}
-                onFocus={e  => (e.target.style.borderColor = "rgba(201,166,70,0.5)")}
-                onBlur={e   => (e.target.style.borderColor = "rgba(255,255,255,0.1)")}
-              />
-            </div>
+    {/* ── MOBILE ── */}
+    <div className="filter-mobile" style={{ display: "none", flexDirection: "column", gap: "0.75rem" }}>
 
-            {/* Type chips */}
-            <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-              {ALL_TYPES.map((t) => (
-                <Chip key={t} label={t} active={type === t} onClick={() => setType(t)} />
-              ))}
-            </div>
+      {/* Row 1 — Search + Filter toggle */}
+      <div style={{ display: "flex", gap: "0.625rem" }}>
+        <div style={{ position: "relative", flex: 1 }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2"
+            style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input
+            value={search} onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search properties…"
+            style={{
+              width: "100%", paddingLeft: "2.25rem", paddingRight: "0.875rem",
+              height: "2.5rem", borderRadius: "9999px",
+              border: "1px solid rgba(255,255,255,0.1)",
+              background: "rgba(255,255,255,0.05)", color: "#FFFFFF",
+              fontSize: "0.85rem", outline: "none",
+            }}
+            onFocus={(e) => (e.target.style.borderColor = "rgba(201,166,70,0.5)")}
+            onBlur={(e)  => (e.target.style.borderColor = "rgba(255,255,255,0.1)")}
+          />
+        </div>
 
-            {/* Divider */}
-            <div style={{ width: "1px", height: "28px", background: "rgba(255,255,255,0.08)" }} />
+        {/* Toggle */}
+        <button
+          onClick={() => setFiltersOpen((v) => !v)}
+          style={{
+            height: "2.5rem", padding: "0 1rem", borderRadius: "9999px", flexShrink: 0,
+            border: filtersOpen ? "1px solid rgba(201,166,70,0.5)" : "1px solid rgba(255,255,255,0.1)",
+            background: filtersOpen ? "rgba(201,166,70,0.1)" : "rgba(255,255,255,0.05)",
+            color: filtersOpen ? "#C9A646" : "#9CA3AF",
+            fontSize: "0.8rem", fontWeight: 600, cursor: "pointer",
+            display: "flex", alignItems: "center", gap: "6px",
+          }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <line x1="4" y1="6" x2="20" y2="6"/>
+            <line x1="8" y1="12" x2="16" y2="12"/>
+            <line x1="11" y1="18" x2="13" y2="18"/>
+          </svg>
+          Filters
+          {(type !== "All" || status !== "All" || sort !== "default") && (
+            <span style={{ width: "6px", height: "6px", borderRadius: "9999px", background: "#C9A646", flexShrink: 0 }} />
+          )}
+        </button>
+      </div>
 
-            {/* Status chips */}
-            <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-              {ALL_STATUS.map((s) => (
-                <Chip key={s} label={s} active={status === s} onClick={() => setStatus(s)} />
-              ))}
-            </div>
+      {/* Row 2 — Collapsible dropdowns */}
+      {filtersOpen && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.625rem" }}>
 
-            {/* Sort */}
-            <select
-              value={sort}
-              onChange={(e) => setSort(e.target.value)}
+          {/* Type dropdown */}
+          <select value={type} onChange={(e) => setType(e.target.value)} style={{
+            width: "100%", height: "2.5rem", padding: "0 1rem",
+            borderRadius: "9999px", border: "1px solid rgba(255,255,255,0.1)",
+            background: "rgba(255,255,255,0.05)", color: "#D1D5DB",
+            fontSize: "0.875rem", cursor: "pointer", outline: "none",
+          }}>
+            {ALL_TYPES.map((t) => (
+              <option key={t} value={t} style={{ background: "#151b27" }}>
+                {t === "All" ? "All Types" : t}
+              </option>
+            ))}
+          </select>
+
+          {/* Status dropdown */}
+          <select value={status} onChange={(e) => setStatus(e.target.value)} style={{
+            width: "100%", height: "2.5rem", padding: "0 1rem",
+            borderRadius: "9999px", border: "1px solid rgba(255,255,255,0.1)",
+            background: "rgba(255,255,255,0.05)", color: "#D1D5DB",
+            fontSize: "0.875rem", cursor: "pointer", outline: "none",
+          }}>
+            {ALL_STATUS.map((s) => (
+              <option key={s} value={s} style={{ background: "#151b27" }}>
+                {s === "All" ? "All Status" : s.charAt(0).toUpperCase() + s.slice(1)}
+              </option>
+            ))}
+          </select>
+
+          {/* Sort dropdown */}
+          <select value={sort} onChange={(e) => setSort(e.target.value)} style={{
+            width: "100%", height: "2.5rem", padding: "0 1rem",
+            borderRadius: "9999px", border: "1px solid rgba(255,255,255,0.1)",
+            background: "rgba(255,255,255,0.05)", color: "#D1D5DB",
+            fontSize: "0.875rem", cursor: "pointer", outline: "none",
+          }}>
+            {SORT_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value} style={{ background: "#151b27" }}>{o.label}</option>
+            ))}
+          </select>
+
+          {/* Clear */}
+          {(search || type !== "All" || status !== "All" || sort !== "default") && (
+            <button
+              onClick={() => { setSearch(""); setType("All"); setStatus("All"); setSort("default"); setFiltersOpen(false); }}
               style={{
-                marginLeft: "auto", height: "2.5rem", padding: "0 1rem",
-                borderRadius: "9999px", border: "1px solid rgba(255,255,255,0.1)",
-                background: "rgba(255,255,255,0.05)", color: "#D1D5DB",
-                fontSize: "0.8rem", cursor: "pointer", outline: "none",
+                height: "2.5rem", borderRadius: "9999px",
+                border: "1px solid rgba(201,166,70,0.3)", background: "rgba(201,166,70,0.08)",
+                color: "#C9A646", fontSize: "0.85rem", fontWeight: 600, cursor: "pointer",
               }}
             >
-              {SORT_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value} style={{ background: "#151b27" }}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Grid ──────────────────────────────────────── */}
-      <section className="section-pad">
-        <div className="container">
-
-          {/* Results count */}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
-            <p style={{ fontSize: "0.85rem", color: "#6B7280" }}>
-              Showing <span style={{ color: "#C9A646", fontWeight: 600 }}>{filtered.length}</span> {filtered.length === 1 ? "property" : "properties"}
-              {type !== "All" && ` · ${type}`}
-              {status !== "All" && ` · ${status}`}
-            </p>
-            {(search || type !== "All" || status !== "All") && (
-              <button
-                onClick={() => { setSearch(""); setType("All"); setStatus("All"); setSort("default"); }}
-                style={{ fontSize: "0.8rem", color: "#C9A646", cursor: "pointer", background: "none", border: "none", letterSpacing: "0.05em" }}
-              >
-                Clear filters ✕
-              </button>
-            )}
-          </div>
-
-          {filtered.length === 0 ? (
-            <div style={{
-              display: "flex", flexDirection: "column", alignItems: "center",
-              justifyContent: "center", gap: "1rem",
-              borderRadius: "1.5rem", border: "1px dashed rgba(255,255,255,0.1)",
-              padding: "6rem 2rem", textAlign: "center",
-            }}>
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#2a3448" strokeWidth="1">
-                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-              </svg>
-              <p style={{ fontWeight: 600, color: "#FFFFFF" }}>No properties found</p>
-              <p style={{ fontSize: "0.875rem", color: "#6B7280" }}>Try adjusting your filters or search term.</p>
-              <button
-                onClick={() => { setSearch(""); setType("All"); setStatus("All"); }}
-                className="btn-outline-hover"
-                style={{
-                  marginTop: "0.5rem", padding: "0.6rem 1.5rem", borderRadius: "9999px",
-                  border: "1px solid rgba(255,255,255,0.15)", color: "#FFFFFF",
-                  fontSize: "0.85rem", fontWeight: 600, background: "transparent",
-                }}
-              >
-                Reset filters
-              </button>
-            </div>
-          ) : (
-            <div style={{
-              display: "grid", gap: "1.5rem",
-              gridTemplateColumns: "repeat(auto-fill, minmax(min(320px,100%), 1fr))",
-            }}>
-              {filtered.map((p, i) => (
-                <div key={p.id} className="reveal" style={{ animationDelay: `${(i % 6) * 0.07}s` }}>
-                  <PropertyCard property={p} agentName={agent.name} agentPhone={agent.whatsapp} />
-                </div>
-              ))}
-            </div>
+              Clear all filters ✕
+            </button>
           )}
         </div>
-      </section>
+      )}
+    </div>
+
+  </div>
+</section>
+
+{/* ── Grid ── */}
+<section className="section-pad">
+  <div className="container">
+
+    {/* Results count */}
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
+      <p style={{ fontSize: "0.85rem", color: "#6B7280" }}>
+        Showing <span style={{ color: "#C9A646", fontWeight: 600 }}>{filtered.length}</span>{" "}
+        {filtered.length === 1 ? "property" : "properties"}
+        {type !== "All" && ` · ${type}`}
+        {status !== "All" && ` · ${status}`}
+      </p>
+      {(search || type !== "All" || status !== "All") && (
+        <button
+          onClick={() => { setSearch(""); setType("All"); setStatus("All"); setSort("default"); }}
+          style={{ fontSize: "0.8rem", color: "#C9A646", cursor: "pointer", background: "none", border: "none", letterSpacing: "0.05em" }}
+        >
+          Clear filters ✕
+        </button>
+      )}
+    </div>
+
+    {filtered.length === 0 ? (
+      <div style={{
+        display: "flex", flexDirection: "column", alignItems: "center",
+        justifyContent: "center", gap: "1rem",
+        borderRadius: "1.5rem", border: "1px dashed rgba(255,255,255,0.1)",
+        padding: "6rem 2rem", textAlign: "center",
+      }}>
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#2a3448" strokeWidth="1">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <p style={{ fontWeight: 600, color: "#FFFFFF" }}>No properties found</p>
+        <p style={{ fontSize: "0.875rem", color: "#6B7280" }}>Try adjusting your filters or search term.</p>
+        <button
+          onClick={() => { setSearch(""); setType("All"); setStatus("All"); }}
+          className="btn-outline-hover"
+          style={{
+            marginTop: "0.5rem", padding: "0.6rem 1.5rem", borderRadius: "9999px",
+            border: "1px solid rgba(255,255,255,0.15)", color: "#FFFFFF",
+            fontSize: "0.85rem", fontWeight: 600, background: "transparent",
+          }}
+        >
+          Reset filters
+        </button>
+      </div>
+    ) : (
+      <div style={{
+        display: "grid", gap: "1.5rem",
+        gridTemplateColumns: "repeat(auto-fill, minmax(min(320px,100%), 1fr))",
+      }}>
+        {filtered.map((p, i) => (
+          <div key={p.id} className="reveal" style={{ animationDelay: `${(i % 6) * 0.07}s` }}>
+            <PropertyCard property={p} agentName={agent.name} agentPhone={agent.whatsapp} />
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+</section>
+
+<style>{`
+  @media (max-width: 640px) {
+    .filter-desktop { display: none !important; }
+    .filter-mobile  { display: flex !important; }
+  }
+`}</style>
 
       {/* ── CTA strip ─────────────────────────────────── */}
       <section style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "4rem 0" }}>
