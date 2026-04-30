@@ -320,7 +320,7 @@ const featured = allProperties.filter((p) => p.featured);
   </Link>
 </div>
 
-              {/* Stats */}
+              {/* Stats values */}
               <div className="anim-fade-up delay-5" style={{
                 display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1.5rem",
                 paddingTop: "2rem", borderTop: "1px solid rgba(255,255,255,0.08)",
