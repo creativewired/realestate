@@ -56,10 +56,10 @@
     "areaUnit": "sqft",
     "shortDescription": "Modern 2-bedroom apartment with direct marina and sea views.",
     "fullDescription": "A beautifully designed two-bedroom apartment in one of Dubai Marina's most sought-after towers. Enjoy stunning marina and sea views from your private balcony. The open-plan living area features premium finishes, a fully fitted kitchen, and smart home automation. Walking distance to the Marina Walk, restaurants, and the beach.",
-    "mainImage": "/images/properties/prop-003-main.jpg",
+    "mainImage": "https://res.cloudinary.com/dna2rsra9/image/upload/v1777624849/luxury-re/properties/uejmlomynxsrspbag0fp.jpg",
     "gallery": [
-      "/images/properties/prop-003-1.jpg",
-      "/images/properties/prop-003-2.jpg"
+      "https://res.cloudinary.com/dna2rsra9/image/upload/v1777624850/luxury-re/properties/yjih2bffujxdusmcwfeq.jpg",
+      "https://res.cloudinary.com/dna2rsra9/image/upload/v1777624851/luxury-re/properties/w3a3jenvrnlp2izka9hj.jpg"
     ],
     "status": "available",
     "featured": false,
