@@ -78,11 +78,12 @@
     "areaUnit": "sqft",
     "shortDescription": "High-floor studio with canal views in the heart of Business Bay.",
     "fullDescription": "A sleek, fully furnished studio on a high floor in Business Bay with unobstructed Dubai Canal views. Perfect as a first home or investment property. Features include a fitted kitchen, built-in wardrobe, and access to a rooftop pool, gym, and concierge services. Minutes from the Dubai Metro and major business hubs.",
-    "mainImage": "/images/properties/prop-005-main.jpg",
+    "mainImage": "https://res.cloudinary.com/dna2rsra9/image/upload/v1777625077/luxury-re/properties/wb0tdrl0s33tchkpx1gh.jpg",
     "gallery": [
-      "/images/properties/prop-005-1.jpg"
+      "https://res.cloudinary.com/dna2rsra9/image/upload/v1777625078/luxury-re/properties/kqcbarv4gbrdw5mhmktp.jpg",
+      "https://res.cloudinary.com/dna2rsra9/image/upload/v1777625078/luxury-re/properties/ploxo1chvjjjemymkoxx.jpg"
     ],
-    "status": "pending",
+    "status": "available",
     "featured": false,
     "createdAt": "2025-03-18T10:00:00Z"
   },
