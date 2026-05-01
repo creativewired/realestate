@@ -100,10 +100,10 @@
     "areaUnit": "sqft",
     "shortDescription": "Elegant 3-bedroom townhouse with private garden in Jumeirah.",
     "fullDescription": "A charming three-bedroom townhouse nestled in the quiet, tree-lined streets of Jumeirah. This property offers a private walled garden, a rooftop terrace, and a fully upgraded interior with bespoke joinery and designer fixtures. Located minutes from the beach, top schools, and Jumeirah's best cafés and boutiques. An ideal family home in one of Dubai's most desirable residential areas.",
-    "mainImage": "/images/properties/prop-006-main.jpg",
+    "mainImage": "https://res.cloudinary.com/dna2rsra9/image/upload/v1777625222/luxury-re/properties/kictf1vnorihfy9rmgqi.avif",
     "gallery": [
-      "/images/properties/prop-006-1.jpg",
-      "/images/properties/prop-006-2.jpg"
+      "https://res.cloudinary.com/dna2rsra9/image/upload/v1777625223/luxury-re/properties/zwgvba4ut29cmwtgfmj6.avif",
+      "https://res.cloudinary.com/dna2rsra9/image/upload/v1777625224/luxury-re/properties/conhcfvarszypqsiwunl.avif"
     ],
     "status": "available",
     "featured": true,
